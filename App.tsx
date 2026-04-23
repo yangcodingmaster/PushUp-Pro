@@ -102,6 +102,44 @@ function App() {
       setState(prev => ({ ...prev, shortcuts: newShortcuts }));
   };
 
+  const handleExport = () => {
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `pushup-pro-backup-${getLocalDate()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+  };
+
+  const handleImport = (file: File): Promise<string | null> => {
+      return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+              try {
+                  const parsed = JSON.parse(e.target?.result as string);
+                  if (!Array.isArray(parsed.logs)) {
+                      resolve('Invalid file: missing logs');
+                      return;
+                  }
+                  const merged: AppState = {
+                      logs: parsed.logs.filter((l: any) => l && typeof l.date === 'string' && typeof l.count === 'number'),
+                      dailyTarget: typeof parsed.dailyTarget === 'number' ? parsed.dailyTarget : state.dailyTarget,
+                      shortcuts: Array.isArray(parsed.shortcuts) && parsed.shortcuts.length === 2 ? parsed.shortcuts : state.shortcuts,
+                  };
+                  setState(merged);
+                  resolve(null);
+              } catch (err) {
+                  resolve('Invalid JSON file');
+              }
+          };
+          reader.onerror = () => resolve('Failed to read file');
+          reader.readAsText(file);
+      });
+  };
+
   if (!isLoaded) return null;
 
   return (
@@ -138,6 +176,8 @@ function App() {
                  onUpdateShortcuts={handleUpdateShortcuts}
                  onUpdateTarget={handleUpdateTarget}
                  onReset={handleResetDaily}
+                 onExport={handleExport}
+                 onImport={handleImport}
                />
               </div>
 

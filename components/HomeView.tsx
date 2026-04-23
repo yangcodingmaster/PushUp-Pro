@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Settings, RotateCcw } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { Settings, RotateCcw, Download, Upload } from 'lucide-react';
 import { Card } from './ui/Card';
 import { Button } from './ui/Button';
 import { Modal } from './ui/Modal';
@@ -12,6 +12,8 @@ interface HomeViewProps {
   onUpdateShortcuts: (newShortcuts: number[]) => void;
   onUpdateTarget: (newTarget: number) => void;
   onReset: () => void;
+  onExport: () => void;
+  onImport: (file: File) => Promise<string | null>;
 }
 
 export const HomeView: React.FC<HomeViewProps> = ({
@@ -22,10 +24,31 @@ export const HomeView: React.FC<HomeViewProps> = ({
   onUpdateShortcuts,
   onUpdateTarget,
   onReset,
+  onExport,
+  onImport,
 }) => {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [tempTarget, setTempTarget] = useState(target.toString());
   const [tempShortcuts, setTempShortcuts] = useState<string[]>(shortcuts.map(s => s.toString()));
+  const [importMsg, setImportMsg] = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = '';
+    if (!file) return;
+    const err = await onImport(file);
+    if (err) {
+      setImportMsg({ type: 'err', text: err });
+    } else {
+      setImportMsg({ type: 'ok', text: 'Data imported successfully' });
+    }
+    setTimeout(() => setImportMsg(null), 3000);
+  };
 
   // Ring Calculations
   const radius = 120;
@@ -206,10 +229,45 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </div>
           </div>
           
+          {/* Data section */}
+          <div className="space-y-2 pt-2">
+            <label className="text-xs font-bold text-gray-400 uppercase tracking-wide ml-1">
+              Data
+            </label>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1 h-12 rounded-2xl border-gray-200 text-gray-700 hover:bg-gray-50"
+                onClick={onExport}
+              >
+                <Download size={16} className="mr-2" /> Export
+              </Button>
+              <Button
+                variant="outline"
+                className="flex-1 h-12 rounded-2xl border-gray-200 text-gray-700 hover:bg-gray-50"
+                onClick={handleImportClick}
+              >
+                <Upload size={16} className="mr-2" /> Import
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={handleFileChange}
+              />
+            </div>
+            {importMsg && (
+              <div className={`text-xs font-medium ml-1 ${importMsg.type === 'ok' ? 'text-emerald-600' : 'text-red-600'}`}>
+                {importMsg.text}
+              </div>
+            )}
+          </div>
+
           <div className="pt-4 flex gap-3">
-             <Button 
-                variant="outline" 
-                className="flex-1 h-14 rounded-2xl border-red-200/50 text-red-600 hover:bg-red-50" 
+             <Button
+                variant="outline"
+                className="flex-1 h-14 rounded-2xl border-red-200/50 text-red-600 hover:bg-red-50"
                 onClick={() => {
                     onReset();
                     setIsSettingsOpen(false);
@@ -217,8 +275,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
              >
                 <RotateCcw size={18} className="mr-2"/> Reset
              </Button>
-            <Button 
-                className="flex-1 bg-gray-900 hover:bg-black text-white h-14 rounded-2xl shadow-lg" 
+            <Button
+                className="flex-1 bg-gray-900 hover:bg-black text-white h-14 rounded-2xl shadow-lg"
                 onClick={handleSaveSettings}
             >
               Save
