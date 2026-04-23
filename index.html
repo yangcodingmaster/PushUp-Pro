@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>PushUp Pro</title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#F2F2F7">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PushUp Pro">
+    <link rel="apple-touch-icon" href="/vite.svg">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Global Typography - Apple System Stack */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "San Francisco", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        background-color: #eef0f4; /* Slightly darker neutral for contrast with glass */
+        overscroll-behavior-y: none;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
+      /* 3D Flip Engine */
+      .perspective-2000 {
+        perspective: 2000px;
+      }
+      .preserve-3d {
+        transform-style: preserve-3d;
+      }
+      .backface-hidden {
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+      }
+      .rotate-y-180 {
+        transform: rotateY(180deg);
+      }
+
+      /* Liquid Glass Edge Lighting */
+      .glass-edge {
+        box-shadow: inset 1px 1px 0 0 rgba(255, 255, 255, 0.4), inset -1px -1px 0 0 rgba(255, 255, 255, 0.05), 0 20px 40px rgba(0,0,0,0.1);
+      }
+
+      /* Smooth transition for ring animations */
+      .ring-circle {
+        transition: stroke-dashoffset 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      /* Mesh Gradient Animations */
+      @keyframes blob-bounce {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(30px, -50px) scale(1.1); }
+        66% { transform: translate(-20px, 20px) scale(0.9); }
+        100% { transform: translate(0px, 0px) scale(1); }
+      }
+      
+      @keyframes blob-bounce-delayed {
+        0% { transform: translate(0px, 0px) scale(1); }
+        33% { transform: translate(-30px, 50px) scale(0.9); }
+        66% { transform: translate(20px, -20px) scale(1.1); }
+        100% { transform: translate(0px, 0px) scale(1); }
+      }
+
+      .animate-blob {
+        animation: blob-bounce 10s infinite ease-in-out;
+      }
+      
+      .animate-blob-delayed {
+        animation: blob-bounce-delayed 12s infinite ease-in-out;
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "recharts": "https://esm.sh/recharts@^3.7.0",
+    "react/": "https://esm.sh/react@^19.2.4/",
+    "react": "https://esm.sh/react@^19.2.4",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "lucide-react": "https://esm.sh/lucide-react@^0.563.0",
+    "react-dom": "https://esm.sh/react-dom@^19.2.4"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body>
+    <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+</html>
